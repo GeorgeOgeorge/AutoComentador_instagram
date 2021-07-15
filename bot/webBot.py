@@ -12,6 +12,7 @@ class WebBot:
     #Class constructor
     def __init__(self, driverPath):
         self.driver = webdriver.Chrome(driverPath)
+        self.post = None
         self.username = None
         self.backupFile = None
 
@@ -19,7 +20,23 @@ class WebBot:
         self.username = username
         self.backupFile = "./" + self.username + ".txt"
 
-    #waiting for the login form to load -> actually doing the login -> skiping the remember button
+    def setPost(self, post):
+        self.post = post
+
+    def comment(self, post, username, password):
+            self.login(username,password)
+            self.setPost(post)
+            self.getFollowers()
+            self.checkRules(post)
+            followers = self.getFollowers()
+            for follower in followers:
+                WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "Ypffh")))
+                WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, "Ypffh")))
+                (self.driver.find_element_by_class_name("Ypffh")).click()
+                (self.driver.find_element_by_class_name("Ypffh")).send_keys(follower + " ")
+                ((self.driver.find_element_by_class_name("X7cDz")).find_elements_by_tag_name("button"))[1].click()
+                sleep(random.randint(30, 60))
+
     def login(self, username, password):
         self.setUsername(username)
         self.driver.get("https://www.instagram.com")
@@ -39,18 +56,6 @@ class WebBot:
         else:
             finalFollowers = self.createBackup()
         return finalFollowers
-
-    def comment(self, post):
-        self.driver.get(post)
-        self.checkRules(post)
-        followers = self.getFollowers()
-        for follower in followers:
-            WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "Ypffh")))
-            WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, "Ypffh")))
-            (self.driver.find_element_by_class_name("Ypffh")).click()
-            (self.driver.find_element_by_class_name("Ypffh")).send_keys(follower + " ")
-            ((self.driver.find_element_by_class_name("X7cDz")).find_elements_by_tag_name("button"))[1].click()
-            sleep(random.randint(30, 60))
 
     def openFollowers(self):
         self.driver.fullscreen_window()
@@ -101,7 +106,7 @@ class WebBot:
         except:
             self.driver.refresh()
 
-    def checkRules(self,post):
+    def checkRules(self):
         rules = ((((self.driver.find_elements_by_class_name("C4VMK"))[0]).find_elements_by_tag_name("span"))[1]).text
         (self.driver.find_elements_by_class_name("wpO6b"))[1].click()
         (self.driver.find_elements_by_class_name("wpO6b"))[4].click()
@@ -117,4 +122,4 @@ class WebBot:
                     (self.driver.find_elements_by_class_name("yZn4P"))[0].click()
         except:
             pass
-        self.driver.get(post)
+        self.driver.get(self.post)
