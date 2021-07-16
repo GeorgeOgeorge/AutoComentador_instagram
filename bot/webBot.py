@@ -9,7 +9,6 @@ from selenium.webdriver.common.keys import Keys
 
 class WebBot:
     
-    #Class constructor
     def __init__(self, driverPath):
         self.driver = webdriver.Chrome(driverPath)
         self.post = None
@@ -26,9 +25,9 @@ class WebBot:
     def comment(self, post, username, password):
             self.login(username,password)
             self.setPost(post)
-            self.getFollowers()
-            self.checkRules(post)
+            self.checkRules()
             followers = self.getFollowers()
+            self.driver.get(self.post)
             for follower in followers:
                 WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, "Ypffh")))
                 WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, "Ypffh")))
@@ -71,14 +70,14 @@ class WebBot:
 
     def fileBackup(self):
         file = open(self.backupFile)
-        finalFollowers = None
+        finalFollowers = []
         for follower in list(file):
             finalFollowers.append(follower[0:len(follower)-1])
         return finalFollowers
 
     def createBackup(self):
         file = open(self.backupFile,"w")
-        finalFollowers = None
+        finalFollowers = []
         followerListAux = self.driver.find_elements_by_class_name("_0imsa")
         followersUrls = []
         for follower in followerListAux:
@@ -107,6 +106,7 @@ class WebBot:
             self.driver.refresh()
 
     def checkRules(self):
+        self.driver.get(self.post)
         rules = ((((self.driver.find_elements_by_class_name("C4VMK"))[0]).find_elements_by_tag_name("span"))[1]).text
         (self.driver.find_elements_by_class_name("wpO6b"))[1].click()
         (self.driver.find_elements_by_class_name("wpO6b"))[4].click()
