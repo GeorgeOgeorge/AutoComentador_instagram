@@ -15,16 +15,13 @@ class WebBot:
         self.username = None
         self.backupFile = None
 
-    def setUsername(self, username):
-        self.username = username
-        self.backupFile = "./" + self.username + ".txt"
-
-    def setPost(self, post):
+    def setData(self, username, post):
         self.post = post
+        self.username = username
+        self.backupFile = "./" + self.username + ".txt"      
 
     def comment(self, post, username, password):
-            self.login(username,password)
-            self.setPost(post)
+            self.login(username,password, post)
             self.checkRules()
             followers = self.getFollowers()
             self.driver.get(self.post)
@@ -36,8 +33,8 @@ class WebBot:
                 ((self.driver.find_element_by_class_name("X7cDz")).find_elements_by_tag_name("button"))[1].click()
                 sleep(random.randint(30, 60))
 
-    def login(self, username, password):
-        self.setUsername(username)
+    def login(self, username, password, post):
+        self.setData(username, post)
         self.driver.get("https://www.instagram.com")
         self.driver.fullscreen_window()
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.NAME, "username")))
